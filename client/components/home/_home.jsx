@@ -1,11 +1,10 @@
-import react, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ApiContext } from '../../utils/api_context';
 import { Route, Routes } from 'react-router-dom';
 import { Rooms } from './rooms';
 import { Room } from './room';
 import { ChatRoom } from '../chat_room/_chat_room';
 import { NewRoomModal } from './new_room_modal';
-import { withRouter, Redirect } from 'react-router-dom';
 
 export const Home = () => {
   const api = useContext(ApiContext);
