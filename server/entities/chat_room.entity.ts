@@ -9,5 +9,11 @@ export class ChatRoom {
   name: string;
 
   @Column()
+  lat: number;
+
+  @Column()
+  long: number;
+
+  @Column()
   roomkey: string;
 }

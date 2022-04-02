@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Button } from '../common/button';
 
 export const NewRoomModal = ({ createRoom, closeModal }) => {
   const [name, setName] = useState('');
@@ -21,10 +20,14 @@ export const NewRoomModal = ({ createRoom, closeModal }) => {
             <span className="title">Create New Chat Room</span>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
             <div className="button-container">
-              <Button onClick={closeModal}>Close</Button>
-              <Button onClick={save}>Create</Button>
+              <button className="my-button" onClick={closeModal}>
+                Close
+              </button>
+              <button className="my-button" onClick={save}>
+                Create
+              </button>
             </div>
-            {error && <div>Name cannot be blank</div>}
+            {error && <div className="error">Name cannot be blank</div>}
           </div>
         </div>
       </div>

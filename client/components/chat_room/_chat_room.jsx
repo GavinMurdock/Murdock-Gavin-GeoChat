@@ -1,8 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { ApiContext } from '../../utils/api_context';
-
-import { Button } from '../common/button';
 import { useMessages } from '../../utils/use_messages';
 import { Message } from './message';
 
@@ -14,6 +12,7 @@ export const ChatRoom = () => {
   const api = useContext(ApiContext);
   const { id } = useParams();
   const [messages, sendMessage] = useMessages(chatRoom);
+
   useEffect(async () => {
     setLoading(true);
     if (!user) {
@@ -25,9 +24,8 @@ export const ChatRoom = () => {
     setLoading(false);
   }, [id]);
 
-  if (loading) return 'Loading...';
+  if (loading) return <div>Loading...</div>;
 
-  console.log(messages);
   return (
     <div className="chat-container">
       <div className="messages">
@@ -37,7 +35,15 @@ export const ChatRoom = () => {
       </div>
       <div className="chat-input">
         <input type="text" value={contents} onChange={(e) => setContents(e.target.value)} />
-        <Button onClick={() => sendMessage(contents, user)}>Send</Button>
+        <button
+          className="my-button"
+          onClick={() => {
+            sendMessage(contents, user);
+            setContents('');
+          }}
+        >
+          Send
+        </button>
       </div>
     </div>
   );

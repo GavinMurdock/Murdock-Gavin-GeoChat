@@ -1,29 +1,64 @@
-import { useContext, useEffect, useState } from 'react';
+import react, { useContext, useEffect, useState } from 'react';
 import { ApiContext } from '../../utils/api_context';
-import { Button } from '../common/button';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { Rooms } from './rooms';
 import { Room } from './room';
 import { ChatRoom } from '../chat_room/_chat_room';
 import { NewRoomModal } from './new_room_modal';
+import { withRouter, Redirect } from 'react-router-dom';
 
 export const Home = () => {
   const api = useContext(ApiContext);
-  // const navigate = useNavigate();
-
   const [chatRooms, setChatRooms] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [lat, setLat] = useState(null);
+  const [long, setLong] = useState(null);
+  const [newRoom, setNewRoom] = useState(null);
+
   useEffect(async () => {
+    navigator.geolocation.getCurrentPosition((location) => {
+      setLat(location.coords.latitude);
+      setLong(location.coords.longitude);
+    });
     const res = await api.get('/users/me');
-    const { chatRooms } = await api.get('/chat_rooms');
-    console.log(chatRooms);
-    setChatRooms(chatRooms);
     setUser(res.user);
-    setLoading(false);
   }, []);
+
+  useEffect(async () => {
+    const { chatRooms } = await api.get('/chat_rooms');
+    const closeChatRooms = isClose(chatRooms);
+    setChatRooms(closeChatRooms);
+    setLoading(false);
+  }, [long]);
+
+  const isClose = (chatRooms) => {
+    let closeRooms = [];
+    for (let chatRoom of chatRooms) {
+      // earth's radius in km
+      const R = 6371;
+
+      // distance between latitudes and longitudes
+      const dLat = ((chatRoom.lat - lat) * Math.PI) / 180.0;
+      const dLon = ((chatRoom.long - long) * Math.PI) / 180.0;
+
+      // to radians
+      const lat1 = (lat * Math.PI) / 180.0;
+      const lat2 = (chatRoom.lat * Math.PI) / 180.0;
+
+      // haversine formula
+      const a = Math.pow(Math.sin(dLat / 2), 2) + Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
+      const distance = R * (2 * Math.asin(Math.sqrt(a)));
+
+      console.log('room ' + chatRoom.name + ' was ' + distance + ' km away.');
+      // define close rooms as any room within ~10 miles of user
+      if (distance < 16) {
+        closeRooms.push(chatRoom);
+      }
+    }
+    return closeRooms;
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -31,9 +66,14 @@ export const Home = () => {
 
   const createRoom = async (name) => {
     setIsOpen(false);
-    const { chatRoom } = await api.post('/chat_rooms', { name });
+    const { chatRoom } = await api.post('/chat_rooms', { name, lat, long });
     setChatRooms([...chatRooms, chatRoom]);
+    setNewRoom(chatRoom);
   };
+
+  if (newRoom) {
+    // couldn't figure out how to auto redirect to the new chat room in time
+  }
 
   return (
     <div className="app-container">
@@ -50,7 +90,17 @@ export const Home = () => {
       <div className="chat-window">
         <Routes>
           <Route path="chat_rooms/:id" element={<ChatRoom />} />
-          <Route path="/*" element={<div>Select a room to get started</div>} />
+          <Route
+            path="/*"
+            element={
+              <>
+                <div className="select-room">
+                  <div>Select a room or create one to get started</div>
+                  <div>(rooms may take a minute to load)</div>
+                </div>
+              </>
+            }
+          />
         </Routes>
       </div>
       {isOpen ? <NewRoomModal createRoom={createRoom} closeModal={() => setIsOpen(false)} /> : null}
