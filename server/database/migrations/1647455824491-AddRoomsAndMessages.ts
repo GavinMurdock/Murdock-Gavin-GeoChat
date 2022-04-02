@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class AddChatRoom1648499682146 implements MigrationInterface {
+export class AddRoomsAndMessages1647455824491 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -17,12 +17,9 @@ export class AddChatRoom1648499682146 implements MigrationInterface {
             type: 'text',
           },
           {
-            name: 'lat',
-            type: 'decimal(8,6)',
-          },
-          {
-            name: 'long',
-            type: 'decimal(9,6)',
+            name: 'roomkey',
+            type: 'text',
+            isUnique: true,
           },
         ],
       }),

@@ -7,22 +7,18 @@ import { Repository } from 'typeorm';
 export class ChatRoomsService {
   constructor(
     @InjectRepository(ChatRoom)
-    private readonly chatRoomsRepository: Repository<ChatRoom>,
+    private readonly chatRoomRepository: Repository<ChatRoom>,
   ) {}
 
   findAll(): Promise<ChatRoom[]> {
-    return this.chatRoomsRepository.find();
+    return this.chatRoomRepository.find();
   }
 
   findOne(id: number): Promise<ChatRoom> {
-    return this.chatRoomsRepository.findOne(id);
+    return this.chatRoomRepository.findOne(id);
   }
 
-  async create(chatRoomPayload: any) {
-    const chatRoom = new ChatRoom();
-    chatRoom.name = chatRoomPayload.name;
-    chatRoom.lat = chatRoomPayload.lat;
-    chatRoom.long = chatRoomPayload.long;
-    return this.chatRoomsRepository.save(chatRoom);
+  async create(chatRoom: ChatRoom): Promise<ChatRoom> {
+    return this.chatRoomRepository.save(chatRoom);
   }
 }

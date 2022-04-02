@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class ChatRoom {
@@ -9,8 +9,5 @@ export class ChatRoom {
   name: string;
 
   @Column()
-  lat: number;
-
-  @Column()
-  long: number;
+  roomkey: string;
 }
